@@ -1,0 +1,9 @@
+POST {{url}}/identidad/login
+Accept: application/json
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "administrador@icc.cl",
+  "contrasena": "badpassword"
+}

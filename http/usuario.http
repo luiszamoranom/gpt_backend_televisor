@@ -1,0 +1,25 @@
+GET {{url}}/usuario
+Accept: application/json
+
+### GET BY ID
+GET {{url}}/usuario?id={{$random.uuid}}
+Accept: application/json
+
+### GET ALL HABILITADO
+@habilitado = false
+GET {{url}}/usuario/deshabilitados
+Accept: application/json
+
+### POST USUARIO
+POST {{url}}/usuario HTTP/1.1
+Host: localhost:9999
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombreUsuario": "Luisz4",
+  "email": "luis4@utalca.cl",
+  "contrasena": "Contrasenagen"
+}
+
+
