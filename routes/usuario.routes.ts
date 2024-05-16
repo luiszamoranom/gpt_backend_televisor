@@ -92,28 +92,4 @@ router.get('/deshabilitados', async (req, res) => {
     }
 });
 
-const schemaRegistrarUsuario = Joi.object({
-    nombreUsuario: Joi.string().required().min(5).max(10),
-    email: Joi.string().email().required(),
-    contrasena: Joi.string().min(5).max(15)
-})
-
-router.post('',async (req,res) => {
-    const { error } = schemaRegistrarUsuario.validate(req.body);
-
-    if (error) {
-        return res.status(400).send(error)
-    }
-
-    if (await violaUniqueNombre(req.body.nombreUsuario) || await violaUniqueEmial(req.body.email)){
-        return res.status(409).send('Ya existe un usuario con ese nombre o email.');
-    }
-
-    const nuevoUsuario = await prisma.usuario.create({
-        data: req.body
-    })
-
-    return res.status(200).send(nuevoUsuario)
-})
-
 export default router;

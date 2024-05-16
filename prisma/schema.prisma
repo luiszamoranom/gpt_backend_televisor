@@ -14,4 +14,5 @@ model Usuario {
   fechaRegistro DateTime @default(now())
   contrasena    String   @db.VarChar(400)
   habilitado    Boolean  @default(true)
+  rol           String   @unique @db.VarChar(20)
 }
