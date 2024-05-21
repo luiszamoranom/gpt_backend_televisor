@@ -16,3 +16,37 @@ model Usuario {
   habilitado    Boolean  @default(true)
   rol           String   @unique @db.VarChar(20)
 }
+
+enum TipoNoticia {
+  Normal
+  Publicacion
+  ConImagen
+  ConVideo
+  ConUrl
+}
+
+model Noticia {
+  id              String      @id @default(uuid())
+  fechaRegistro   DateTime    @default(now())
+  habilitado      Boolean     @default(true)
+  duracion        Int         @default(5)
+  titulo          String      @default("Titulo por defecto") @db.VarChar(50)  //esto puede ser cambiado, consultar
+  contenido       String?     @db.VarChar(1024) //esto puede ser cambiado, consultar
+  tipo            TipoNoticia @default(Normal)
+  multimedia      String?     @db.Text // Para almacenar imágenes/videos en base64
+  multimedia_url  String?     @db.Text // En caso de ingresar url
+  extension       String?
+  categories      Categoria[]
+}
+model Categoria {
+  id              String      @id @default(uuid())
+  nombre          String
+  noticia         Noticia[]
+}
+
+
+
+
+// WINDOWS - VS CODE
+// Para crear la migracion: npx prisma migrate dev --name {nombre-migracion}
+// Para aplicar cambios: npx prisma db push
