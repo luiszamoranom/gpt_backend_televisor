@@ -20,9 +20,8 @@ model Usuario {
 enum TipoNoticia {
   Normal
   Publicacion
-  ConImagen
-  ConVideo
-  ConUrl
+  Multimedia
+  Url
 }
 
 model Noticia {
