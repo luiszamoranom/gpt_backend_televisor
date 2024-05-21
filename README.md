@@ -5,7 +5,11 @@
 
 # PARA TENER EL SCHEMA DE LA APP EN TU BD LOCAL:
 
-prisma db pull
+prisma db push
+
+o en Windows:
+
+npx prisma db push
 
 # IDE para interactuar con la BD
 
