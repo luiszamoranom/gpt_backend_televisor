@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors'
 import usuarioRoute from './routes/usuario.routes'
 import identidadRoute from './routes/identidad.routes'
+import noticiaRoute from './routes/noticia.routes'
 import { validarRolEnToken } from './utils/validarToken';
 
 export const app = express();
@@ -19,6 +20,7 @@ app.use(express.json({limit: '2mb'}));
 
 // rutas individual de cada tabla
 app.use("/identidad", identidadRoute)
+app.use("/noticia", noticiaRoute)
 app.use("/usuario", validarRolEnToken(['administrador']), usuarioRoute)
 
 app.get("/ping", async (req, res) => {

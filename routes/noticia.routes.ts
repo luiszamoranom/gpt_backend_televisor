@@ -35,6 +35,10 @@ const schemaPostNoticiaNormal = Joi.object({
         'string.empty': 'extension, campo que registra la extension del archivo, no puede estar vacio',
         'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
     }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
+    })
 });
 
 const schemaPostNoticiaMultimedia = Joi.object({
@@ -62,6 +66,10 @@ const schemaPostNoticiaMultimedia = Joi.object({
         'string.empty': 'extension, campo que registra la extension del archivo, no puede estar vacio',
         'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
     }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
+    })
 });
 
 const schemaPostNoticiaPublicacion = Joi.object({
@@ -75,10 +83,18 @@ const schemaPostNoticiaPublicacion = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
+    contenido: Joi.string().required().min(5).max(50).messages({
+        'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
+        'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
+    }),
     tipo: Joi.string().pattern(/^(Publicacion)$/).required().messages({
         'any.required': 'tipo es obligatorio',
         'string.empty': 'el tipo no puede estar vacío',
         'string.pattern.base': 'El tipo debe ser Publicacion'
+    }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
     })
 });
 
@@ -101,6 +117,10 @@ const schemaPostNoticiaUrl = Joi.object({
     multimedia_url: Joi.string().required().messages({
         'number.min': 'multimedia_url, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
         'number.max': 'multimedia_url, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
+    }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
     })
 });
 
@@ -192,8 +212,109 @@ router.get('/deshabilitados', async (req, res) => {
     }
 });
 
-router.post('/noticia-normal', async (req,res) => {
 
+router.post('/noticia-normal', async (req,res) => {
+    const { error } = schemaPostNoticiaNormal.validate(req.body);
+
+    if (error) {
+        return res.status(400)
+        .set('x-mensaje', error.details[0].message)
+        .end()
+    }
+    
+    const noticia = await prisma.noticia.create({
+        data: {
+          duracion: req.body.duracion,
+          titulo: req.body.titulo,
+          contenido: req.body.contenido,
+          tipo: req.body.tipo,
+          multimedia: req.body.multimedia,
+          extension: req.body.extension,
+          categoriaId: req.body.categoriaId
+        }
+    })
+
+    if (noticia){
+        return res.status(201).end();
+    }
+    console.log(noticia)
+    return res.status(409).end();
+});
+router.post('/noticia-publicacion', async (req,res) => {
+    const { error } = schemaPostNoticiaPublicacion.validate(req.body);
+
+    if (error) {
+        return res.status(400)
+        .set('x-mensaje', error.details[0].message)
+        .end()
+    }
+    
+    const noticia = await prisma.noticia.create({
+        data: {
+          duracion: req.body.duracion,
+          titulo: req.body.titulo,
+          contenido: req.body.contenido,
+          tipo: req.body.tipo,
+          categoriaId: req.body.categoriaId
+        }
+    })
+
+    if (noticia){
+        return res.status(201).end();
+    }
+    console.log(noticia)
+    return res.status(409).end();
+});
+router.post('/noticia-multimedia', async (req,res) => {
+    const { error } = schemaPostNoticiaMultimedia.validate(req.body);
+
+    if (error) {
+        return res.status(400)
+        .set('x-mensaje', error.details[0].message)
+        .end()
+    }
+    
+    const noticia = await prisma.noticia.create({
+        data: {
+          duracion: req.body.duracion,
+          titulo: req.body.titulo,
+          tipo: req.body.tipo,
+          multimedia: req.body.multimedia,
+          extension: req.body.extension,
+          categoriaId: req.body.categoriaId
+        }
+    })
+
+    if (noticia){
+        return res.status(201).end();
+    }
+    console.log(noticia)
+    return res.status(409).end();
+});
+router.post('/noticia-url', async (req,res) => {
+    const { error } = schemaPostNoticiaUrl.validate(req.body);
+
+    if (error) {
+        return res.status(400)
+        .set('x-mensaje', error.details[0].message)
+        .end()
+    }
+    
+    const noticia = await prisma.noticia.create({
+        data: {
+          duracion: req.body.duracion,
+          titulo: req.body.titulo,
+          tipo: req.body.tipo,
+          multimedia_url: req.body.multimedia_url,
+          categoriaId: req.body.categoriaId
+        }
+    })
+
+    if (noticia){
+        return res.status(201).end();
+    }
+    console.log(noticia)
+    return res.status(409).end();
 });
 
 export default router;

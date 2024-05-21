@@ -24,6 +24,12 @@ enum TipoNoticia {
   Url
 }
 
+model Categoria {
+  id              String      @id @default(uuid())
+  nombre          String      @default("Sin categoría")
+  noticias        Noticia[]
+}
+
 model Noticia {
   id              String      @id @default(uuid())
   fechaRegistro   DateTime    @default(now())
@@ -35,13 +41,10 @@ model Noticia {
   multimedia      String?     @db.Text // Para almacenar imágenes/videos en base64
   multimedia_url  String?     @db.Text // En caso de ingresar url
   extension       String?
-  categories      Categoria[]
+  categoria       Categoria   @relation(fields: [categoriaId], references: [id])
+  categoriaId     String      @default("Sin categoría")
 }
-model Categoria {
-  id              String      @id @default(uuid())
-  nombre          String
-  noticia         Noticia[]
-}
+
 
 
 
