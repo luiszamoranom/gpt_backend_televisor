@@ -281,18 +281,7 @@ router.get('/habilitadas', async (req, res) => {
         const noticias_habilitadas = await prisma.noticia.findMany({
             where: {
                 habilitado: true
-            },
-            select: {
-                id: true,
-                fechaRegistro: true,
-                titulo: true,
-                duracion: true,
-                categoria: {
-                    select: {
-                      nombre: true
-                    }
-                }
-              }
+            }
         });
 
         if (!noticias_habilitadas.length) {
