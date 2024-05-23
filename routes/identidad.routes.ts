@@ -54,8 +54,12 @@ router.post("/login", async (req, res) => {
         rol
     },secretKey,{ expiresIn: '1h' })
 
+    const respuesta = {
+        name: usuario.nombreUsuario,
+        token: accessToken
+    } 
     res.status(200)
-        .send(accessToken)
+        .send(respuesta)
         .end()
 })
 
