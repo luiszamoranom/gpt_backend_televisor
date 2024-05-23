@@ -121,6 +121,20 @@ const schemaPostNoticiaUrl = Joi.object({
     })
 });
 
+const schemaPatchEstadoNoticiaList = Joi.object({
+    array: Joi.array()
+    .items(Joi.string().uuid().message('Cada elemento del array debe ser un UUID válido'))
+    .min(1)
+    .required()
+    .messages({
+        'array.base': 'El campo array debe ser un array',
+        'array.min': 'El array debe contener al menos 1 UUID',
+        'any.required': 'El campo array es obligatorio'
+    }),
+    estado: Joi.boolean().valid().required().messages({
+        'boolean.base': 'estado debe ser booleano (true o false)'
+    })
+});
 const schemaPatchEstadoNoticia = Joi.object({
     estado: Joi.boolean().valid().required().messages({
         'boolean.base': 'estado debe ser booleano (true o false)'
@@ -433,6 +447,55 @@ router.post('/noticia-url', async (req,res) => {
     return res.status(409).end();
 });
 
+router.patch('/cambiar-estado-list', async (req,res) => {
+    const { error } = schemaPatchEstadoNoticiaList.validate(req.body);
+
+    if (error) {
+        return res.status(400)
+        .set('x-mensaje', error.details[0].message)
+        .end()
+    }
+    
+    const array = req.body.array
+    const fails = []
+    for (let i=0;i<array.length;i++){
+        try {
+            const update_noticia = await prisma.noticia.update({
+                where: {
+                    id: array[i]
+                },
+                data: {
+                    habilitado: req.body.estado
+                },
+            });
+            //console.log(`Noticia con id ${array[i]} creada exitosamente.`);
+        } catch (error:any) {
+            if (error.code === 'P2025') {
+                console.log(`No se pudo actualizar la noticia con id ${array[i]}, no existe.`);
+                fails.push(array[i]);
+            } else {
+                console.error(`Error inesperado al actualizar la noticia con id ${array[i]}: `, error);
+                fails.push(array[i]);
+            }
+        }
+    }
+    if (fails.length === array.length) {
+        return res.status(404)
+            .set('x-mensaje', 'Ninguna de las noticias ingresadas se encontró.')
+            .send(fails)
+            .end();
+    } else if (fails.length === 0) {
+        return res.status(200)
+            .set('x-mensaje', 'Todas las noticias se actualizaron correctamente.')
+            .send(fails)
+            .end();
+    } else {
+        return res.status(207)
+            .set('x-mensaje', 'Algunas noticias se actualizaron, otras no se encontraron.')
+            .send(fails)
+            .end();
+    }
+});
 router.patch('/cambiar-estado', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});

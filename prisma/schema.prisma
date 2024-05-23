@@ -48,7 +48,6 @@ model Noticia {
 
 
 
-
 // WINDOWS - VS CODE
 // Para crear la migracion: npx prisma migrate dev --name {nombre-migracion}
 // Para aplicar cambios: npx prisma db push
