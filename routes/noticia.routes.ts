@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 
-const schemaPostNoticiaNormal = Joi.object({
+const schemaPostNoticiaNormalFoto = Joi.object({
     duracion: Joi.number().min(1).max(300).required().messages({
         'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
         'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
@@ -30,17 +30,17 @@ const schemaPostNoticiaNormal = Joi.object({
         'any.required': 'multimedia, campo que registra el archivo de la noticia, es obligatorio',
         'string.empty': 'multimedia, campo que registra el archivo de la noticia, no puede estar vacio',
     }),
-    extension: Joi.string().pattern(/^(png|jpg|jpeg|mp4)$/).required().min(2).max(4).messages({
+    extension: Joi.string().pattern(/^(png|jpg|jpeg)$/).required().min(2).max(4).messages({
         'any.required': 'extension, campo que registra la extension del archivo, es obligatorio',
         'string.empty': 'extension, campo que registra la extension del archivo, no puede estar vacio',
-        'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
+        'string.pattern.base': 'Los tipos disponibles son: png,jpg y jpeg.'
     }),
     categoriaId : Joi.string().uuid().required().messages({
         'any.required': 'El uuid de categoria es obligatorio',
         'string.guid': 'El uuid de categoria debe ser uuid/guid'
     })
 });
-const schemaPostNoticiaMultimedia = Joi.object({
+const schemaPostNoticiaSoloFoto = Joi.object({
     duracion: Joi.number().min(1).max(300).required().messages({
         'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
         'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
@@ -60,10 +60,35 @@ const schemaPostNoticiaMultimedia = Joi.object({
         'any.required': 'multimedia, campo que registra el archivo de la noticia, es obligatorio',
         'string.empty': 'multimedia, campo que registra el archivo de la noticia, no puede estar vacio',
     }),
-    extension: Joi.string().pattern(/^(png|jpg|jpeg|mp4)$/).required().min(2).max(4).messages({
+    extension: Joi.string().pattern(/^(png|jpg|jpeg)$/).required().min(2).max(4).messages({
         'any.required': 'extension, campo que registra la extension del archivo, es obligatorio',
         'string.empty': 'extension, campo que registra la extension del archivo, no puede estar vacio',
         'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
+    }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
+    })
+});
+const schemaPostNoticiaSoloVideo = Joi.object({
+    duracion: Joi.number().min(1).max(300).required().messages({
+        'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
+        'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
+    }),
+    titulo: Joi.string().required().min(5).max(50).messages({
+        'any.required': 'titulo, campo que registra el titulo de una noticia es obligatorio',
+        'string.empty': 'titulo, campo que registra el titulo de una noticia, no puede estar vacio',
+        'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
+        'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
+    }),
+    tipo: Joi.string().pattern(/^(Url)$/).required().messages({
+        'any.required': 'tipo es obligatorio',
+        'string.empty': 'el tipo no puede estar vacío',
+        'string.pattern.base': 'El tipo debe ser Url.'
+    }),
+    multimedia_url: Joi.string().required().messages({
+        'number.min': 'multimedia_url, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
+        'number.max': 'multimedia_url, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
     }),
     categoriaId : Joi.string().uuid().required().messages({
         'any.required': 'El uuid de categoria es obligatorio',
@@ -95,31 +120,7 @@ const schemaPostNoticiaPublicacion = Joi.object({
         'string.guid': 'El uuid de categoria debe ser uuid/guid'
     })
 });
-const schemaPostNoticiaUrl = Joi.object({
-    duracion: Joi.number().min(1).max(300).required().messages({
-        'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
-        'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
-    }),
-    titulo: Joi.string().required().min(5).max(50).messages({
-        'any.required': 'titulo, campo que registra el titulo de una noticia es obligatorio',
-        'string.empty': 'titulo, campo que registra el titulo de una noticia, no puede estar vacio',
-        'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
-        'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
-    }),
-    tipo: Joi.string().pattern(/^(Url)$/).required().messages({
-        'any.required': 'tipo es obligatorio',
-        'string.empty': 'el tipo no puede estar vacío',
-        'string.pattern.base': 'El tipo debe ser Url.'
-    }),
-    multimedia_url: Joi.string().required().messages({
-        'number.min': 'multimedia_url, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
-        'number.max': 'multimedia_url, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
-    }),
-    categoriaId : Joi.string().uuid().required().messages({
-        'any.required': 'El uuid de categoria es obligatorio',
-        'string.guid': 'El uuid de categoria debe ser uuid/guid'
-    })
-});
+
 
 const schemaPatchEstadoNoticiaList = Joi.object({
     array: Joi.array()
@@ -140,7 +141,7 @@ const schemaPatchEstadoNoticia = Joi.object({
         'boolean.base': 'estado debe ser booleano (true o false)'
     }),
 })
-const schemaPatchNoticiaNormal = Joi.object({
+const schemaPatchNoticiaNormalFoto = Joi.object({
     duracion: Joi.number().min(1).max(300).messages({
         'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
         'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
@@ -156,14 +157,14 @@ const schemaPatchNoticiaNormal = Joi.object({
     multimedia: Joi.string().base64().messages({
         'string.empty': 'multimedia, campo que registra el archivo de la noticia, no puede estar vacio',
     }),
-    extension: Joi.string().pattern(/^(png|jpg|jpeg|mp4)$/).min(2).max(4).messages({
-        'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
+    extension: Joi.string().pattern(/^(png|jpg|jpeg)$/).min(2).max(4).messages({
+        'string.pattern.base': 'Los tipos disponibles son: png,jpg y jpeg.'
     }),
     categoriaId : Joi.string().uuid().messages({
         'string.guid': 'El uuid de categoria debe ser uuid/guid'
     })
 });
-const schemaPatchNoticiaMultimedia = Joi.object({
+const schemaPatchNoticiaSoloFoto = Joi.object({
     duracion: Joi.number().min(1).max(300).required().messages({
         'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
         'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
@@ -178,10 +179,30 @@ const schemaPatchNoticiaMultimedia = Joi.object({
         'any.required': 'multimedia, campo que registra el archivo de la noticia, es obligatorio',
         'string.empty': 'multimedia, campo que registra el archivo de la noticia, no puede estar vacio',
     }),
-    extension: Joi.string().pattern(/^(png|jpg|jpeg|mp4)$/).required().min(2).max(4).messages({
+    extension: Joi.string().pattern(/^(png|jpg|jpeg)$/).required().min(2).max(4).messages({
         'any.required': 'extension, campo que registra la extension del archivo, es obligatorio',
         'string.empty': 'extension, campo que registra la extension del archivo, no puede estar vacio',
-        'string.pattern.base': 'Los tipos disponibles son: png,jpg,jpeg y mp4.'
+        'string.pattern.base': 'Los tipos disponibles son: png,jpg y jpeg.'
+    }),
+    categoriaId : Joi.string().uuid().required().messages({
+        'any.required': 'El uuid de categoria es obligatorio',
+        'string.guid': 'El uuid de categoria debe ser uuid/guid'
+    })
+});
+const schemaPatchNoticiaVideo = Joi.object({
+    duracion: Joi.number().min(1).max(300).required().messages({
+        'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
+        'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
+    }),
+    titulo: Joi.string().required().min(5).max(50).messages({
+        'any.required': 'titulo, campo que registra el titulo de una noticia es obligatorio',
+        'string.empty': 'titulo, campo que registra el titulo de una noticia, no puede estar vacio',
+        'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
+        'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
+    }),
+    multimedia_url: Joi.string().required().messages({
+        'number.min': 'multimedia_url, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
+        'number.max': 'multimedia_url, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
     }),
     categoriaId : Joi.string().uuid().required().messages({
         'any.required': 'El uuid de categoria es obligatorio',
@@ -202,26 +223,6 @@ const schemaPatchNoticiaPublicacion = Joi.object({
     contenido: Joi.string().required().min(5).max(50).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
-    }),
-    categoriaId : Joi.string().uuid().required().messages({
-        'any.required': 'El uuid de categoria es obligatorio',
-        'string.guid': 'El uuid de categoria debe ser uuid/guid'
-    })
-});
-const schemaPatchNoticiaUrl = Joi.object({
-    duracion: Joi.number().min(1).max(300).required().messages({
-        'number.min': 'duracion, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
-        'number.max': 'duracion, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
-    }),
-    titulo: Joi.string().required().min(5).max(50).messages({
-        'any.required': 'titulo, campo que registra el titulo de una noticia es obligatorio',
-        'string.empty': 'titulo, campo que registra el titulo de una noticia, no puede estar vacio',
-        'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
-        'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
-    }),
-    multimedia_url: Joi.string().required().messages({
-        'number.min': 'multimedia_url, campo que registra la duración de una noticia, debe ser como mínimo 1 segundo',
-        'number.max': 'multimedia_url, campo que registra la duración de una noticia, debe ser como máximo 300 segundos',
     }),
     categoriaId : Joi.string().uuid().required().messages({
         'any.required': 'El uuid de categoria es obligatorio',
@@ -326,7 +327,7 @@ router.get('/deshabilitadas', async (req, res) => {
 
 
 router.post('/noticia-normal', async (req,res) => {
-    const { error } = schemaPostNoticiaNormal.validate(req.body);
+    const { error } = schemaPostNoticiaNormalFoto.validate(req.body);
 
     if (error) {
         return res.status(400)
@@ -381,8 +382,8 @@ router.post('/noticia-publicacion', async (req,res) => {
     console.log(noticia)
     return res.status(409).end();
 });
-router.post('/noticia-multimedia', async (req,res) => {
-    const { error } = schemaPostNoticiaMultimedia.validate(req.body);
+router.post('/noticia-foto', async (req,res) => {
+    const { error } = schemaPostNoticiaSoloFoto.validate(req.body);
 
     if (error) {
         return res.status(400)
@@ -409,8 +410,8 @@ router.post('/noticia-multimedia', async (req,res) => {
     console.log(noticia)
     return res.status(409).end();
 });
-router.post('/noticia-url', async (req,res) => {
-    const { error } = schemaPostNoticiaUrl.validate(req.body);
+router.post('/noticia-video', async (req,res) => {
+    const { error } = schemaPostNoticiaSoloVideo.validate(req.body);
 
     if (error) {
         return res.status(400)
@@ -535,7 +536,7 @@ router.patch('/modificar-noticia-normal', async (req,res) => {
             .end()
     }
     
-    const { error:error2 } = schemaPatchNoticiaNormal.validate(req.body);
+    const { error:error2 } = schemaPatchNoticiaNormalFoto.validate(req.body);
     if (error2) {
         return res.status(400)
         .set('x-mensaje', error2.details[0].message)
@@ -573,73 +574,6 @@ router.patch('/modificar-noticia-normal', async (req,res) => {
     }
     if (req.body.contenido !== undefined && req.body.contenido !== noticiaId.contenido) {
       data.contenido = req.body.contenido;
-    }
-    if (req.body.multimedia !== undefined && req.body.multimedia !== noticiaId.multimedia) {
-      data.multimedia = req.body.multimedia;
-    }
-    if (req.body.extension !== undefined && req.body.extension !== noticiaId.extension) {
-      data.extension = req.body.extension;
-    }
-    if (req.body.categoriaId !== undefined && req.body.categoriaId !== noticiaId.categoriaId) {
-      data.categoriaId = req.body.categoriaId;
-    }
-
-    const update_noticia = await prisma.noticia.update({
-        where: {
-          id: id
-        },
-        data: data,
-    });
-
-    if (update_noticia){
-        return res.status(204)
-        .set('x-mensaje', 'Noticia actualizada.')
-        .end();
-    }
-    return res.status(409).end();
-});
-router.patch('/modificar-noticia-multimedia', async (req,res) => {
-    const id = req.query.id as string;
-    const { error } = schemaBuscarPorId.validate({id:id});
-    if (error) {
-        return res.status(400)
-            .end()
-    }
-    
-    const { error:error2 } = schemaPatchNoticiaMultimedia.validate(req.body);
-    if (error2) {
-        return res.status(400)
-        .set('x-mensaje', error2.details[0].message)
-        .end()
-    }    
-
-    const noticiaId = await prisma.noticia.findFirst({
-        where: {
-            id: id
-        }
-    })
-    if(!noticiaId){
-        return res.status(404)
-            .set('x-mensaje','No existe noticia con ese id')
-            .end()
-    }
-    const categoriaId = await prisma.categoria.findFirst({
-        where: {
-            id: req.body.categoriaId
-        }
-    })
-    if(!categoriaId){
-        return res.status(404)
-        .set('x-mensaje','No existe categoria con ese id')    
-        .end()
-    }
-    const data: { [key: string]: any } = {};
-
-    if (req.body.duracion !== undefined && req.body.duracion !== noticiaId.duracion) {
-      data.duracion = req.body.duracion;
-    }
-    if (req.body.titulo !== undefined && req.body.titulo !== noticiaId.titulo) {
-      data.titulo = req.body.titulo;
     }
     if (req.body.multimedia !== undefined && req.body.multimedia !== noticiaId.multimedia) {
       data.multimedia = req.body.multimedia;
@@ -730,7 +664,7 @@ router.patch('/modificar-noticia-publicacion', async (req,res) => {
     }
     return res.status(409).end();
 });
-router.patch('/modificar-noticia-url', async (req,res) => {
+router.patch('/modificar-noticia-foto', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -738,7 +672,74 @@ router.patch('/modificar-noticia-url', async (req,res) => {
             .end()
     }
     
-    const { error:error2 } = schemaPatchNoticiaUrl.validate(req.body);
+    const { error:error2 } = schemaPatchNoticiaSoloFoto.validate(req.body);
+    if (error2) {
+        return res.status(400)
+        .set('x-mensaje', error2.details[0].message)
+        .end()
+    }    
+
+    const noticiaId = await prisma.noticia.findFirst({
+        where: {
+            id: id
+        }
+    })
+    if(!noticiaId){
+        return res.status(404)
+            .set('x-mensaje','No existe noticia con ese id')
+            .end()
+    }
+    const categoriaId = await prisma.categoria.findFirst({
+        where: {
+            id: req.body.categoriaId
+        }
+    })
+    if(!categoriaId){
+        return res.status(404)
+        .set('x-mensaje','No existe categoria con ese id')    
+        .end()
+    }
+    const data: { [key: string]: any } = {};
+
+    if (req.body.duracion !== undefined && req.body.duracion !== noticiaId.duracion) {
+      data.duracion = req.body.duracion;
+    }
+    if (req.body.titulo !== undefined && req.body.titulo !== noticiaId.titulo) {
+      data.titulo = req.body.titulo;
+    }
+    if (req.body.multimedia !== undefined && req.body.multimedia !== noticiaId.multimedia) {
+      data.multimedia = req.body.multimedia;
+    }
+    if (req.body.extension !== undefined && req.body.extension !== noticiaId.extension) {
+      data.extension = req.body.extension;
+    }
+    if (req.body.categoriaId !== undefined && req.body.categoriaId !== noticiaId.categoriaId) {
+      data.categoriaId = req.body.categoriaId;
+    }
+
+    const update_noticia = await prisma.noticia.update({
+        where: {
+          id: id
+        },
+        data: data,
+    });
+
+    if (update_noticia){
+        return res.status(204)
+        .set('x-mensaje', 'Noticia actualizada.')
+        .end();
+    }
+    return res.status(409).end();
+});
+router.patch('/modificar-noticia-video', async (req,res) => {
+    const id = req.query.id as string;
+    const { error } = schemaBuscarPorId.validate({id:id});
+    if (error) {
+        return res.status(400)
+            .end()
+    }
+    
+    const { error:error2 } = schemaPatchNoticiaVideo.validate(req.body);
     if (error2) {
         return res.status(400)
         .set('x-mensaje', error2.details[0].message)
