@@ -1,3 +1,5 @@
+@url = 'http://localhost:9999'
+
 POST {{url}}/identidad/login
 Accept: application/json
 Content-Type: application/json
