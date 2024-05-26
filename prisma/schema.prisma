@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TipoRol {
+  Administrador
+  Registrador
+}
+
 model Usuario {
   id            String   @id @default(uuid())
   nombreUsuario String   @unique @db.VarChar(20)
@@ -14,7 +19,7 @@ model Usuario {
   fechaRegistro DateTime @default(now())
   contrasena    String   @db.VarChar(400)
   habilitado    Boolean  @default(true)
-  rol           String   @unique @db.VarChar(20)
+  rol           TipoRol  @default(Registrador)
 }
 
 enum TipoNoticia {
@@ -26,7 +31,7 @@ enum TipoNoticia {
 
 model Categoria {
   id              String      @id @default(uuid())
-  nombre          String      @default("Sin categoría")
+  nombre          String      @default("Sin categoría") @unique
   noticias        Noticia[]
 }
 
