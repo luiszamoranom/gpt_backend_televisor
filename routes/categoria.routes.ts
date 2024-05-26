@@ -52,11 +52,13 @@ router.post('/',async (req,res) => {
     return res.status(409).end();
 });
 
-router.patch('/',async (req,res)=>{
+router.patch('',async (req,res)=>{
     const id = req.query.id as string;
-    const { error } = schemaUuid.validate({id:id});
+    const { error } = schemaUuid.validate(id);
     if (error) {
+        //console.log(error)
         return res.status(400)
+            .set('x-mensaje', error.details[0].message)
             .end()
     }
 
@@ -76,7 +78,7 @@ router.patch('/',async (req,res)=>{
             nombre:req.body.nombre
         }
     })
-    if (categoriaNombre?.id != id){
+    if (categoriaNombre && categoriaNombre?.id != id){
         return res.status(400)
         .set('x-mensaje','El nombre de la categoría ya existe')
         .end()
