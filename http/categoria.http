@@ -1,0 +1,16 @@
+@url='http://localhost:9999'
+
+GET {{url}}/categoria
+Accept: application/json
+
+### POST USUARIO
+POST {{url}}/categoria HTTP/1.1
+Host: localhost:9999
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombre": "categoria 1"
+}
+
+
