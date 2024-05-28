@@ -17,7 +17,7 @@ const schemaPostNoticiaNormalFoto = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
-    contenido: Joi.string().required().min(5).max(50).messages({
+    contenido: Joi.string().required().min(5).max(1024).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
     }),
@@ -106,7 +106,7 @@ const schemaPostNoticiaPublicacion = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
-    contenido: Joi.string().required().min(5).max(50).messages({
+    contenido: Joi.string().required().min(5).max(1024).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
     }),
@@ -150,7 +150,7 @@ const schemaPatchNoticiaNormalFoto = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
-    contenido: Joi.string().min(5).max(50).messages({
+    contenido: Joi.string().min(5).max(1024).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
     }),
@@ -220,7 +220,7 @@ const schemaPatchNoticiaPublicacion = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
-    contenido: Joi.string().required().min(5).max(50).messages({
+    contenido: Joi.string().required().min(5).max(1024).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
     }),
@@ -235,7 +235,7 @@ const schemaBuscarPorId = Joi.object({
 })
 // OBTENER TODOS LOS USUARIOS
 router.get('/', async (req, res) => {
-    const usuarios = await prisma.noticia.findMany({
+    const noticias = await prisma.noticia.findMany({
         select: {
             id: true,
             fechaRegistro: true,
@@ -250,10 +250,10 @@ router.get('/', async (req, res) => {
             }
           }
     })
-    if(usuarios.length == 0 ){
+    if(noticias.length == 0 ){
         return res.status(204).end()
     }
-    return res.status(200).send(usuarios)
+    return res.status(200).send(noticias)
 })
 // OBTENER POR ID
 router.get('/find-by-id', async (req,res) => {
