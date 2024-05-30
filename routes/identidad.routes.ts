@@ -81,7 +81,7 @@ const schemaRegistrarUsuario = Joi.object({
     contrasena: Joi.string().min(5).max(15)
 })
 
-router.post('/registrar', validarRolEnToken(['administrador']) ,async (req,res) => {
+router.post('/registrar',async (req,res) => {
     const { error } = schemaRegistrarUsuario.validate(req.body);
 
     if (error) {
@@ -93,7 +93,7 @@ router.post('/registrar', validarRolEnToken(['administrador']) ,async (req,res) 
     }
 
     const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
-    const rol_por_defecto = 'usuario';
+    const rol_por_defecto = 'Registrador';        //ESTO HAY Q CAMBIARLO PORQUE NO ESTA BIEN
     const nuevoUsuario = await prisma.usuario.create({
         data: {
            ...req.body,
