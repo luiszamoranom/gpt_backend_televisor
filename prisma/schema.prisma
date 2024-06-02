@@ -41,7 +41,7 @@ model Noticia {
   habilitado      Boolean     @default(true)
   duracion        Int         @default(5)
   titulo          String      @default("Titulo por defecto") @db.VarChar(50)  //esto puede ser cambiado, consultar
-  contenido       String?     @db.VarChar(1024) //esto puede ser cambiado, consultar
+  contenido       String?     @db.VarChar(500) //esto puede ser cambiado, consultar
   tipo            TipoNoticia @default(Normal)
   multimedia      String?     @db.Text // Para almacenar imágenes en base64
   multimedia_url  String?     @db.Text // En caso de ingresar url

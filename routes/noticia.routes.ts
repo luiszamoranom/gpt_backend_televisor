@@ -17,9 +17,9 @@ const schemaPostNoticiaNormalFoto = Joi.object({
         'string.min': 'titulo, campo que registra el titulo de una noticia, debe tener un largo mínimo de 4 caracteres',
         'string.max': 'titulo, campo que registra el titulo de una noticia, debe tener un largo máximo de 50 caracteres',
     }),
-    contenido: Joi.string().required().min(5).max(1024).messages({
+    contenido: Joi.string().required().min(5).max(500).messages({
         'string.min': 'contenido, campo que registra el contenido de una noticia, debe tener un largo mínimo de 4 caracteres',
-        'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 1024 caracteres',
+        'string.max': 'contenido, campo que registra el contenido de una noticia, debe tener un largo máximo de 500 caracteres',
     }),
     tipo: Joi.string().pattern(/^(Normal)$/).required().messages({
         'any.required': 'tipo es obligatorio',
