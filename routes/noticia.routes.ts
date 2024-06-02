@@ -797,4 +797,39 @@ router.patch('/modificar-noticia-video', async (req,res) => {
     return res.status(409).end();
 });
 
+
+router.delete('',async (req,res) => {
+    const id = req.query.id as string;
+    const { error } = schemaBuscarPorId.validate({id:id});
+    if (error) {
+        return res.status(400)
+            .end()
+    }
+
+    const noticiaId = await prisma.noticia.findFirst({
+        where: {
+            id: id
+        }
+    })
+    if(!noticiaId){
+        return res.status(404)
+            .set('x-mensaje','No existe noticia con ese id')
+            .end()
+    }
+
+    const noticiaDelete = await prisma.noticia.delete({
+        where: {
+            id: id
+        }
+    })
+    if(noticiaDelete){
+        return res.status(202)
+            .set('x-mensaje','Eliminado correctamente')
+            .end()
+    }
+    return res.status(409)
+            .set('x-mensaje','Ocurrió un error al eliminar')
+            .end()
+});
+
 export default router;
