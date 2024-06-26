@@ -21,7 +21,6 @@ const schemaUuid = Joi.string().uuid().required().messages({
 
 router.get('/',async (req,res) => {
     const categorias = await prisma.categoria.findMany()
-    console.log(categorias)
 
     if(categorias.length == 0 ){
         return res.status(204).end()
@@ -37,13 +36,22 @@ router.post('/',async (req,res) => {
         .end()
     }
 
+    const categoriaNombre = await prisma.categoria.findFirst({
+        where: {
+            nombre: req.body.nombre
+        }
+    })
+    if(categoriaNombre){
+        return res.status(405)
+            .set('x-mensaje','Ya existe categoria con ese nombre')
+            .end()
+    }
+
     const categoria = await prisma.categoria.create({
         data:{
             nombre:req.body.nombre
         }
-    });
-
-    
+    });    
     if (categoria){
         return res.status(201)
         .set('x-mensaje', 'Categoria registrada.')
