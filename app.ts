@@ -25,7 +25,7 @@ app.use("/noticia", noticiaRoute)
 app.use("/categoria", categoriaRoute)
 app.use("/usuario", validarRolEnToken(['administrador']), usuarioRoute)
 
-app.get("/ping", async (req, res) => {
+app.get("/ping", async (req:any, res:any) => {
     res.send( {data: "pong"})
 });
 

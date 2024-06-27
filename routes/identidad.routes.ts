@@ -81,7 +81,7 @@ const schemaRegistrarUsuario = Joi.object({
     contrasena: Joi.string().min(5).max(15)
 })
 
-router.post('/registrar',async (req,res) => {
+router.post('/registrar',async (req:any, res:any) => {
     const { error } = schemaRegistrarUsuario.validate(req.body);
 
     if (error) {
