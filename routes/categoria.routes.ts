@@ -18,22 +18,12 @@ const schemaUuid = Joi.string().uuid().required().messages({
     'string.guid': 'El path id debe ser uuid/guid'
 })
 
-
-router.get('/',async (req,res) => {
-    const categorias = await prisma.categoria.findMany()
-
-    if(categorias.length == 0 ){
-        return res.status(204).end()
-    }
-    return res.status(200).send(categorias)
-});
-
 router.post('/',async (req,res) => {
     const { error } = schemaPostCategoria.validate(req.body);
     if (error) {
         return res.status(400)
-        .set('x-mensaje', error.details[0].message)
-        .end()
+            .set('x-mensaje', error.details[0].message)
+            .end()
     }
 
     const categoriaNombre = await prisma.categoria.findFirst({
@@ -51,63 +41,99 @@ router.post('/',async (req,res) => {
         data:{
             nombre:req.body.nombre
         }
-    });    
+    });
     if (categoria){
         return res.status(201)
-        .set('x-mensaje', 'Categoria registrada.')
-        .end();
+            .set('x-mensaje', 'Categoria registrada.')
+            .end();
     }
     return res.status(409).end();
 });
 
-router.patch('',async (req,res)=>{
-    const id = req.query.id as string;
-    const { error } = schemaUuid.validate(id);
-    if (error) {
-        //console.log(error)
-        return res.status(400)
-            .set('x-mensaje', error.details[0].message)
-            .end()
-    }
+router.get('/',async (req,res) => {
+    const categorias = await prisma.categoria.findMany()
 
-    const categoriaId = await prisma.categoria.findFirst({
-        where: {
-            id:id
-        }
-    })
-    if(!categoriaId){
-        return res.status(404)
-            .set('x-mensaje','No existe categoría con ese id')
-            .end()
+    if(categorias.length == 0 ){
+        return res.status(204).end()
     }
+    return res.status(200).send(categorias)
+});
 
-    const categoriaNombre = await prisma.categoria.findFirst({
-        where: {
-            nombre:req.body.nombre
-        }
-    })
-    if (categoriaNombre && categoriaNombre?.id != id){
-        return res.status(400)
-        .set('x-mensaje','El nombre de la categoría ya existe')
-        .end()
+router.get('/',async (req,res) => {
+    const categorias = await prisma.categoria.findMany()
+
+    if(categorias.length == 0 ){
+        return res.status(204).end()
     }
+    return res.status(200).send(categorias)
+});
 
-    const update_categoria = await prisma.categoria.update({
+
+router.get('/:id', async (req, res) => {
+
+    const categoriaPorId = await prisma.categoria.findFirst({
         where: {
-          id: id
-        },
-        data: {
-            nombre:req.body.nombre
+            id: req.params.id
         }
     });
-    if (update_categoria){
-        return res.status(204)
-        .set('x-mensaje', 'Categoría actualizada.')
-        .end();
-    }
-    return res.status(409).end();
 
+    if (categoriaPorId) {
+        return res.status(200)
+            .json(categoriaPorId);
+    } else {
+        return res.status(404)
+            .set('x-mensaje', 'Categoria no encontrada.')
+            .end();
+    }
 });
 
+router.patch('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const { error } = schemaUuid.validate(id);
+    if (error) {
+        return res.status(400)
+            .set('x-mensaje', error.details[0].message)
+            .end();
+    }
+
+    const { nombre } = req.body;
+
+    try {
+
+        const categoriaExistente = await prisma.categoria.findFirst({
+            where: {
+                nombre: nombre,
+                NOT: { id: id },
+            },
+        });
+
+        if (categoriaExistente) {
+            return res.status(400)
+                .set('x-mensaje', 'El nombre de la categoría ya existe')
+                .end();
+        }
+
+        const categoriaActualizada = await prisma.categoria.update({
+            where: { id },
+            data: { nombre },
+        });
+
+        if (categoriaActualizada) {
+            return res.status(200)
+                .json(categoriaActualizada)
+                .end();
+        } else {
+            return res.status(404)
+                .set('x-mensaje', 'Categoría no encontrada')
+                .end();
+        }
+    } catch (error) {
+        console.error('Error al actualizar la categoría:', error);
+        return res.status(500)
+            .set('x-mensaje', 'Error interno del servidor')
+            .end();
+    }
+});
 
 export default router;
