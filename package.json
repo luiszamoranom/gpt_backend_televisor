@@ -16,6 +16,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "nodemon": "^3.0.3",
+    "rimraf": "^5.0.7",
     "prisma": "^5.14.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
@@ -31,7 +32,6 @@
     "joi": "^17.12.2",
     "jsonwebtoken": "^9.0.2",
     "postgres": "^3.4.3",
-    "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
     "uuid": "^9.0.1"
   }
