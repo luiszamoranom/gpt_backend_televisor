@@ -234,7 +234,7 @@ const schemaBuscarPorId = Joi.object({
     id: Joi.string().required().uuid()
 })
 // OBTENER TODOS LOS USUARIOS
-router.get('/', async (req:any, res:any) => {
+router.get('/', async (req, res) => {
     const noticias = await prisma.noticia.findMany({
         select: {
             id: true,
@@ -247,7 +247,7 @@ router.get('/', async (req:any, res:any) => {
                 select: {
                   nombre: true
                 }
-            }
+            },
           }
     })
     if(noticias.length == 0 ){
@@ -255,8 +255,9 @@ router.get('/', async (req:any, res:any) => {
     }
     return res.status(200).send(noticias)
 })
+
 // OBTENER POR ID
-router.get('/find-by-id', async (req:any, res:any) => {
+router.get('/find-by-id', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
 
@@ -277,11 +278,14 @@ router.get('/find-by-id', async (req:any, res:any) => {
     }
     return res.status(200).send(noticiaId)
 })
-router.get('/habilitadas', async (req:any, res:any) => {
+router.get('/habilitadas', async (req, res) => {
     try {
         const noticias_habilitadas = await prisma.noticia.findMany({
             where: {
                 habilitado: true
+            },
+            orderBy: {
+                updatedAt: 'desc'
             }
         });
 
@@ -295,7 +299,7 @@ router.get('/habilitadas', async (req:any, res:any) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 });
-router.get('/deshabilitadas', async (req:any, res:any) => {
+router.get('/deshabilitadas', async (req, res) => {
     try {
         const noticia_deshabilitada = await prisma.noticia.findMany({
             where: {
@@ -326,7 +330,7 @@ router.get('/deshabilitadas', async (req:any, res:any) => {
 });
 
 
-router.post('/noticia-normal', async (req:any, res:any) => {
+router.post('/noticia-normal', async (req,res) => {
     const { error } = schemaPostNoticiaNormalFoto.validate(req.body);
 
     if (error) {
@@ -355,7 +359,7 @@ router.post('/noticia-normal', async (req:any, res:any) => {
     console.log(noticia)
     return res.status(409).end();
 });
-router.post('/noticia-publicacion', async (req:any, res:any) => {
+router.post('/noticia-publicacion', async (req,res) => {
     const { error } = schemaPostNoticiaPublicacion.validate(req.body);
 
     if (error) {
@@ -382,7 +386,7 @@ router.post('/noticia-publicacion', async (req:any, res:any) => {
     console.log(noticia)
     return res.status(409).end();
 });
-router.post('/noticia-foto', async (req:any, res:any) => {
+router.post('/noticia-foto', async (req,res) => {
     const { error } = schemaPostNoticiaSoloFoto.validate(req.body);
 
     if (error) {
@@ -410,7 +414,7 @@ router.post('/noticia-foto', async (req:any, res:any) => {
     console.log(noticia)
     return res.status(409).end();
 });
-router.post('/noticia-video', async (req:any, res:any) => {
+router.post('/noticia-video', async (req,res) => {
     const { error } = schemaPostNoticiaSoloVideo.validate(req.body);
 
     if (error) {
@@ -437,7 +441,7 @@ router.post('/noticia-video', async (req:any, res:any) => {
     return res.status(409).end();
 });
 
-router.patch('/cambiar-estado-list', async (req:any, res:any) => {
+router.patch('/cambiar-estado-list', async (req,res) => {
     const { error } = schemaPatchEstadoNoticiaList.validate(req.body);
 
     if (error) {
@@ -486,7 +490,7 @@ router.patch('/cambiar-estado-list', async (req:any, res:any) => {
             .end();
     }
 });
-router.patch('/cambiar-estado', async (req:any, res:any) => {
+router.patch('/cambiar-estado', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -528,7 +532,7 @@ router.patch('/cambiar-estado', async (req:any, res:any) => {
     }
     return res.status(409).end();
 });
-router.patch('/modificar-noticia-normal', async (req:any, res:any) => {
+router.patch('/modificar-noticia-normal', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -599,7 +603,7 @@ router.patch('/modificar-noticia-normal', async (req:any, res:any) => {
     }
     return res.status(409).end();
 });
-router.patch('/modificar-noticia-publicacion', async (req:any, res:any) => {
+router.patch('/modificar-noticia-publicacion', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -664,7 +668,7 @@ router.patch('/modificar-noticia-publicacion', async (req:any, res:any) => {
     }
     return res.status(409).end();
 });
-router.patch('/modificar-noticia-foto', async (req:any, res:any) => {
+router.patch('/modificar-noticia-foto', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -731,7 +735,7 @@ router.patch('/modificar-noticia-foto', async (req:any, res:any) => {
     }
     return res.status(409).end();
 });
-router.patch('/modificar-noticia-video', async (req:any, res:any) => {
+router.patch('/modificar-noticia-video', async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
@@ -798,7 +802,7 @@ router.patch('/modificar-noticia-video', async (req:any, res:any) => {
 });
 
 
-router.delete('',async (req:any, res:any) => {
+router.delete('',async (req,res) => {
     const id = req.query.id as string;
     const { error } = schemaBuscarPorId.validate({id:id});
     if (error) {
