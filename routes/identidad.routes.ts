@@ -2,7 +2,7 @@ import {Router } from 'express';
 import {PrismaClient} from "@prisma/client";
 import Joi from 'joi';
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { validarRolEnToken } from '../utils/validarToken';
 
 const router = Router();
@@ -54,8 +54,12 @@ router.post("/login", async (req, res) => {
         rol
     },secretKey,{ expiresIn: '1h' })
 
+    const respuesta = {
+        name: usuario.nombreUsuario,
+        token: accessToken
+    } 
     res.status(200)
-        .send(accessToken)
+        .send(respuesta)
         .end()
 })
 
@@ -77,7 +81,7 @@ const schemaRegistrarUsuario = Joi.object({
     contrasena: Joi.string().min(5).max(15)
 })
 
-router.post('/registrar', validarRolEnToken(['administrador']) ,async (req,res) => {
+router.post('/registrar',async (req:any, res:any) => {
     const { error } = schemaRegistrarUsuario.validate(req.body);
 
     if (error) {
@@ -89,7 +93,7 @@ router.post('/registrar', validarRolEnToken(['administrador']) ,async (req,res) 
     }
 
     const hashedPassword = await bcrypt.hash(req.body.contrasena, 10);
-    const rol_por_defecto = 'usuario';
+    const rol_por_defecto = 'Registrador';        //ESTO HAY Q CAMBIARLO PORQUE NO ESTA BIEN
     const nuevoUsuario = await prisma.usuario.create({
         data: {
            ...req.body,

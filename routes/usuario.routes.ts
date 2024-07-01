@@ -17,7 +17,7 @@ async function violaUniqueEmial(email: string): Promise<boolean> {
 }
 
 // OBTENER TODOS LOS USUARIOS
-router.get('/', async (req, res) => {
+router.get('/', async (req:any, res:any) => {
     const usuarios = await prisma.usuario.findMany()
     if(usuarios.length == 0 ){
         return res.status(204).end()
@@ -32,7 +32,7 @@ const schemaBuscarPorId = Joi.object({
 })
 
 // OBTENER POR ID
-router.get('/', async (req,res) => {
+router.get('/', async (req:any, res:any) => {
     const id = req.query.rut as string;
     const { error } = schemaBuscarPorId.validate(req.params);
 
@@ -54,7 +54,7 @@ router.get('/', async (req,res) => {
 })
 
 
-router.get('/habilitados', async (req, res) => {
+router.get('/habilitados', async (req:any, res:any) => {
     try {
         const usuarioEncontrado = await prisma.usuario.findMany({
             where: {
@@ -73,7 +73,7 @@ router.get('/habilitados', async (req, res) => {
     }
 });
 
-router.get('/deshabilitados', async (req, res) => {
+router.get('/deshabilitados', async (req:any, res:any) => {
     try {
         const usuarioEncontrado = await prisma.usuario.findMany({
             where: {
